@@ -71,13 +71,7 @@ Clone repository
 
 Install dependencies
 - pip install -r requirements.txt
-2. Run Analysis
-- Launch Jupyter for interactive analysis
-- jupyter notebook notebooks/01_EDA.ipynb
-
-- Or run complete analysis pipeline
-- python src/models/pipeline.py
-3. Launch Dashboard
+2. Launch Dashboard
  Backend API (Terminal 1)
  - cd backend
 - python app.py  # API at http://localhost:5000
