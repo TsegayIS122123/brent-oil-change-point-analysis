@@ -1,0 +1,111 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "brent-oil-change-point-analysis"
+version = "1.0.0"
+description = "Bayesian change point analysis of Brent crude oil prices with interactive dashboard"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Tsegay", email = "your.email@example.com"}
+]
+requires-python = ">=3.13"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+keywords = ["oil-prices", "bayesian", "change-point", "time-series", "pymc"]
+dependencies = [
+    "numpy>=2.2.6",
+    "pandas>=2.3.3",
+    "matplotlib>=3.10.8",
+    "pymc>=5.10.0",
+    "flask>=3.1.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black>=25.12.0",
+    "pylint>=3.0.0",
+    "pytest>=9.0.0",
+    "pytest-cov>=5.0.0",
+    "jupyterlab>=4.5.1",
+]
+dashboard = [
+    "flask-cors>=6.0.2",
+    "flask-restful>=0.3.10",
+]
+full = [
+    "seaborn>=0.13.2",
+    "scipy>=1.16.3",
+    "statsmodels>=0.14.5",
+    "prophet>=1.3.0",
+    "scikit-learn>=1.8.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/TsegayIS122123/brent-oil-change-point-analysis"
+Documentation = "https://github.com/TsegayIS122123/brent-oil-change-point-analysis#readme"
+Repository = "https://github.com/TsegayIS122123/brent-oil-change-point-analysis"
+Issues = "https://github.com/TsegayIS122123/brent-oil-change-point-analysis/issues"
+
+[tool.black]
+line-length = 88
+target-version = ['py313']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.pylint.master]
+max-line-length = 88
+disable = [
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "missing-function-docstring",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --cov=src --cov-report=term-missing --cov-report=html"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::FutureWarning",
+]
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["*/tests/*", "*/test_*.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
