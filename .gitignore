@@ -43,9 +43,6 @@ data/processed/
 data/external/
 data/raw/
 
-# Dashboard
-dashboard/frontend/node_modules/
-dashboard/frontend/build/
 
 # OS
 .DS_Store
