@@ -1,0 +1,135 @@
+# Change Point Models: Theory and Application to Oil Prices
+
+## 1. Purpose of Change Point Models
+
+### Definition
+Change point models are statistical methods that identify points in time when the probability distribution of a time series changes. These models detect **structural breaks** - points where the underlying data-generating process undergoes fundamental change.
+
+### Application to Oil Price Analysis
+In the context of Brent crude oil prices, change point models help us:
+
+1. **Identify Regime Shifts**: Detect transitions between different market regimes (e.g., stable vs volatile periods)
+
+2. **Quantify Event Impacts**: Measure how much prices change after significant events
+
+3. **Separate Signal from Noise**: Distinguish permanent structural changes from temporary fluctuations
+
+4. **Improve Forecasting**: Different models can be applied to different regimes for better predictions
+
+## 2. How Change Point Models Work
+
+### Basic Concept
+The fundamental idea is that a time series can be partitioned into segments, each with its own statistical properties. The model's task is to:
+1. Estimate the number of change points
+2. Determine their locations
+3. Estimate parameters for each segment
+
+### Mathematical Formulation
+For a time series y₁, y₂, ..., yₙ:
+
+We assume there are m change points at positions τ₁, τ₂, ..., τₘ where:
+- Segment 1: y₁ to yₜ₁ with parameters θ₁
+- Segment 2: yₜ₁₊₁ to yₜ₂ with parameters θ₂
+- ...
+- Segment m+1: yₜₘ₊₁ to yₙ with parameters θₘ₊₁
+
+The goal is to estimate τ and θ that maximize the likelihood or posterior probability.
+
+## 3. Bayesian Change Point Detection
+
+### Advantages for Oil Price Analysis
+1. **Uncertainty Quantification**: Provides full posterior distributions for change point locations
+2. **Prior Information**: Allows incorporation of domain knowledge about likely change points
+3. **Flexibility**: Can handle complex models and multiple change points
+4. **Interpretability**: Results in probabilistic statements about when changes occurred
+
+### Model Components
+1. **Prior on Change Points**:
+   - Discrete uniform distribution over time indices
+   - Can be informed by historical event knowledge
+
+2. **Segment Parameters**:
+   - Means (μ): Price levels in different regimes
+   - Variances (σ²): Volatility changes
+   - Can also include trend parameters
+
+3. **Likelihood Function**:
+   - Typically Normal or Student's t for financial returns
+   - Conditional on being in a particular regime
+
+### Inference via MCMC
+- Use Markov Chain Monte Carlo (specifically NUTS sampler in PyMC)
+- Sample from posterior distribution of all parameters
+- Convergence diagnostics ensure reliable results
+
+## 4. Expected Outputs
+
+### Primary Outputs
+1. **Change Point Locations**:
+   - Most probable dates of structural breaks
+   - 95% credible intervals for uncertainty
+
+2. **Regime Parameters**:
+   - Mean prices before/after changes
+   - Volatility estimates for each regime
+   - Probability of regime membership
+
+3. **Impact Metrics**:
+   - Absolute price differences
+   - Percentage changes
+   - Statistical significance measures
+
+### Secondary Outputs
+1. **Model Diagnostics**:
+   - Convergence statistics (R-hat, effective sample size)
+   - Posterior predictive checks
+   - Model comparison metrics (WAIC, LOO)
+
+2. **Visualizations**:
+   - Posterior distributions of change points
+   - Time series plots with regime shading
+   - Uncertainty bands around estimates
+
+## 5. Limitations and Considerations
+
+### Statistical Limitations
+1. **Model Specification Risk**: Results depend on chosen likelihood and priors
+2. **Multiple Change Points**: Determining optimal number is challenging
+3. **Computational Complexity**: MCMC sampling can be time-consuming
+4. **Boundary Effects**: Early/late change points are harder to detect
+
+### Practical Limitations for Oil Prices
+1. **Gradual vs. Abrupt Changes**: Models assume abrupt changes, but real transitions can be gradual
+2. **Confounding Events**: Multiple simultaneous events can create attribution problems
+3. **Market Anticipation**: Prices may adjust before official event dates
+4. **Global Interconnectedness**: Events in one region affect all markets differently
+
+### Interpretation Caveats
+1. **Correlation ≠ Causation**: Detected change points may coincide with events but not be caused by them
+2. **Data Mining Risk**: With enough potential change points, some will appear significant by chance
+3. **Overfitting**: Complex models can detect spurious change points
+4. **Sample Size Requirements**: Need sufficient data before/after changes for reliable estimation
+
+## 6. Model Selection Criteria
+
+For this analysis, we choose Bayesian change point models because:
+
+1. **Uncertainty is Key**: Investors and policymakers need probabilistic assessments
+2. **Prior Knowledge Exists**: Historical events provide informative priors
+3. **Multiple Regimes Likely**: Oil markets have clear historical periods with different dynamics
+4. **Transparency**: Bayesian approach makes assumptions explicit
+
+### Alternative Models Considered
+1. **CUSUM Tests**: Simpler but less informative about magnitude
+2. **Binary Segmentation**: Computationally efficient but sequential
+3. **Hidden Markov Models**: Allow smoother transitions between states
+4. **Machine Learning Approaches**: Random forests, neural networks (less interpretable)
+
+## 7. Implementation in PyMC
+
+The PyMC implementation will feature:
+
+1. **Flexible Likelihoods**: Normal, Student's t, or custom distributions
+2. **Multiple Change Points**: Using latent variables or Dirichlet process
+3. **Efficient Sampling**: NUTS algorithm with parallel chains
+4. **Comprehensive Diagnostics**: Built-in convergence checks
