@@ -57,6 +57,102 @@ graph TD
     E --> G[Stakeholders];
     F --> G;
  ```   
+# Task 1
+# Brent Oil Price Change Point Analysis 
+
+This project analyzes how geopolitical and economic events affect Brent crude oil prices using Bayesian change point detection. Task 1 focuses on laying the foundation through comprehensive data analysis, event research, and statistical understanding.
+
+### 1. **Analysis Plan Document** (`docs/analysis_plan.md`)
+A comprehensive 2-page roadmap detailing our phased approach:
+
+**Key Sections:**
+- **5-Phase Workflow**: Data Preparation → Statistical Analysis → Modeling → Insight Generation → Reporting
+- **Stakeholder Communication**: Tailored strategies for investors, policymakers, and energy companies
+- **Critical Distinction**: Clear documentation of correlation vs. causation limitations
+- **Assumptions & Limitations**: 5 key assumptions and 4 major limitations documented
+
+### 2. **Events Dataset** 
+18 carefully researched geopolitical/economic events with metadata:
+
+| Event | Date | Type | Severity | Expected Impact |
+|-------|------|------|----------|-----------------|
+| Iraq invades Kuwait | 1990-08-02 | Geopolitical Conflict | Very High | Negative |
+| 9/11 Attacks | 2001-09-11 | Geopolitical | High | Negative |
+| Global Financial Crisis | 2008-07-11 | Economic | Very High | Negative |
+| COVID-19 Pandemic | 2020-01-02 | Economic | Very High | Negative |
+| Russia invades Ukraine | 2022-02-24 | Geopolitical Conflict | Very High | Positive |
+
+**Event Distribution:**
+- Geopolitical Conflicts: 6 events
+- OPEC Policy Changes: 5 events  
+- Economic Events: 4 events
+- Sanctions: 3 events
+
+### 3. **Time Series Analysis** 
+Comprehensive statistical analysis revealing critical data properties:
+
+#### 📈 **Key Data Statistics:**
+- **Time Period**: May 20, 1987 to November 14, 2022 (35 years)
+- **Observations**: 9,011 daily prices
+- **Price Range**: $9.10 to $143.95 per barrel
+- **Average Price**: $48.42 per barrel
+- **Annualized Volatility**: 40.53% (extremely high)
+
+#### 🔬 **Statistical Findings:**
+- Raw Prices: NON-STATIONARY (ADF p=0.289) ❌
+- Log Prices: NON-STATIONARY (ADF p=0.376) ❌
+- Returns: STATIONARY (ADF p=0.000) ✅
+- Log Returns: STATIONARY (ADF p=0.000) ✅*
+
+**Conclusion**: Must use log returns for modeling (stationary transformation)
+
+**Distribution Properties:**
+- **Skewness**: -1.744 (negative → more large drops than jumps)
+- **Kurtosis**: 65.905 (massive fat tails vs. Normal's 3.0)
+- **Jarque-Bera Test**: p=0.000000 → STRONGLY reject normality
+- **ARCH Test**: p=0.000000 → STRONG volatility clustering
+
+**Volatility Patterns:**
+- Clear clustering: high volatility periods persist
+- Major clusters: 2008-2009, 2014-2016, 2020
+- Autocorrelation present in squared returns
+
+### 4. **Date Format Issue Resolved**
+**Problem**: Dataset had mixed date formats:
+- 1987-2019: `"20-May-87"` (Day-MonthAbbr-Year2Digit)
+- 2020-2022: `"Apr 22, 2020"` (MonthAbbr Day, Year4Digit)
+
+**Solution**: Used `pd.to_datetime(..., format='mixed')` to automatically handle both formats
+
+### 5. **Modeling Implications Derived from Data**
+
+#### 🎯 **Critical Decisions for Task 2:**
+1. **Target Variable**: Log Returns (stationary, interpretable as % changes)
+2. **Likelihood**: Student's t-distribution (fat tails confirmed)
+3. **Volatility**: Time-varying (ARCH effects confirmed)
+4. **Change Points**: Multiple expected (5-10 over 35 years)
+5. **Approach**: Bayesian for uncertainty quantification
+
+#### ⚠️ **Key Limitations Identified:**
+1. **Correlation ≠ Causation**: Statistical association doesn't prove impact
+2. **Confounding Events**: Multiple simultaneous events create attribution challenges
+3. **Market Anticipation**: Prices may adjust before official event dates
+4. **Model Simplification**: Single change point is a simplification
+
+## 🔍 **Key Insights for data Preparation**
+
+### **Statistical Foundation Established:**
+1. **Oil returns are stationary** → Validates time series modeling
+2. **Extreme non-normality** → Requires robust distributions (Student's t)
+3. **Volatility clusters** → Suggests regime-switching or GARCH components
+4. **Negative skewness** → More large crashes than rallies
+
+### **Business Implications:**
+1. **High volatility (40.5% annual)** → High risk/reward for investors
+2. **Fat tails** → "Black swan" events are common in oil markets
+3. **Negative skew** → Risk management crucial (more downside risk)
+4. **35-year trends** → Multiple regime shifts expected
+
 
 # 🚀 Quick Start
 1. Installation
