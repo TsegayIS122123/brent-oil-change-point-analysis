@@ -57,12 +57,11 @@ graph TD
     E --> G[Stakeholders];
     F --> G;
  ```   
-# Task 1
 # Brent Oil Price Change Point Analysis 
 
 This project analyzes how geopolitical and economic events affect Brent crude oil prices using Bayesian change point detection. Task 1 focuses on laying the foundation through comprehensive data analysis, event research, and statistical understanding.
 
-### 1. **Analysis Plan Document** (`docs/analysis_plan.md`)
+### 1. **Analysis Plan Document** 
 A comprehensive 2-page roadmap detailing our phased approach:
 
 **Key Sections:**
