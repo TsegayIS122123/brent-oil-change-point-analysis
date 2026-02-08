@@ -58,3 +58,4 @@ htmlcov/
 # Environment variables
 .env
 .env.local
+frontend/node_modules/
