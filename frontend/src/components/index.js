@@ -8,7 +8,8 @@ export { default as CorrelationMatrix } from './CorrelationMatrix';
 export { default as PredictiveInsights } from './PredictiveInsights';
 export { default as ChangePointAnalysis } from './ChangePointAnalysis';
 export { default as EventImpactAnalysis } from './EventImpactAnalysis';
-export { default as ExportPanel } from './ExportPanel';
+// REMOVE: export { default as ExportPanel } from './ExportPanel';
 export { default as DateRangePicker } from './DateRangePicker';
 export { default as EventTypePieChart } from './EventTypePieChart';
 export { default as VolatilityChart } from './VolatilityChart';
+export { default as SettingsPanel } from './SettingsPanel';  // ADD THIS
