@@ -18,7 +18,6 @@ CORS(app)  # Enable CORS for React frontend
 DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data')
 PROCESSED_DATA_PATH = os.path.join(DATA_DIR, 'processed', 'brent_prices_processed.csv')
 EVENTS_DATA_PATH = os.path.join(DATA_DIR, 'external', 'key_events.csv')
-RESULTS_PATH = os.path.join(os.path.dirname(__file__), '..', 'notebooks', '02_Change_Point_Modeling.ipynb')
 
 # Load data
 try:
@@ -101,23 +100,45 @@ def get_prices():
         start_date = request.args.get('start_date')
         end_date = request.args.get('end_date')
         
+        # Load fresh data each time to avoid cache issues
+        try:
+            price_data = pd.read_csv(PROCESSED_DATA_PATH)
+            price_data['Date'] = pd.to_datetime(price_data['Date'])
+            price_data = price_data.sort_values('Date')
+            print(f"✓ Loaded price data: {len(price_data)} rows")
+        except Exception as e:
+            print(f"❌ Error loading price data: {e}")
+            return jsonify({
+                "success": False,
+                "error": f"Failed to load price data: {str(e)}"
+            }), 500
+        
         data = price_data.copy()
         
         # Apply date filters if provided
         if start_date:
-            start_date = pd.to_datetime(start_date)
-            data = data[data['Date'] >= start_date]
+            try:
+                start_date = pd.to_datetime(start_date)
+                data = data[data['Date'] >= start_date]
+            except:
+                pass
         if end_date:
-            end_date = pd.to_datetime(end_date)
-            data = data[data['Date'] <= end_date]
+            try:
+                end_date = pd.to_datetime(end_date)
+                data = data[data['Date'] <= end_date]
+            except:
+                pass
         
         # Convert to list of dictionaries for JSON
-        result = data.to_dict('records')
+        result = []
+        for _, row in data.iterrows():
+            result.append({
+                "Date": row['Date'].strftime('%Y-%m-%d') if pd.notna(row['Date']) else None,
+                "Price": float(row['Price']) if pd.notna(row['Price']) else 0.0,
+                "Log_Return": float(row.get('Log_Return', 0)) if 'Log_Return' in row else 0.0
+            })
         
-        # Format dates as strings
-        for item in result:
-            if 'Date' in item and pd.notna(item['Date']):
-                item['Date'] = item['Date'].strftime('%Y-%m-%d')
+        print(f"📊 Sending {len(result)} price records to frontend")
         
         return jsonify({
             "success": True,
@@ -130,9 +151,10 @@ def get_prices():
         })
     
     except Exception as e:
+        print(f"❌ Error in /api/prices: {str(e)}")
         return jsonify({
             "success": False,
-            "error": str(e)
+            "error": f"Internal server error: {str(e)}"
         }), 500
 
 @app.route('/api/events', methods=['GET'])
@@ -211,7 +233,14 @@ def get_summary():
         avg_price = price_data['Price'].mean()
         min_price = price_data['Price'].min()
         max_price = price_data['Price'].max()
-        volatility = price_data['Log_Return'].std() if 'Log_Return' in price_data.columns else 0
+        
+        # Calculate volatility if Log_Return exists
+        if 'Log_Return' in price_data.columns:
+            volatility = price_data['Log_Return'].std()
+        else:
+            # Calculate returns if not available
+            price_data['Returns'] = price_data['Price'].pct_change()
+            volatility = price_data['Returns'].std()
         
         # Calculate annual returns
         if len(price_data) > 1:
@@ -256,29 +285,41 @@ def get_summary():
 def get_volatility():
     """Get volatility metrics and rolling volatility"""
     try:
-        if price_data.empty or 'Log_Return' not in price_data.columns:
-            raise ValueError("Price data with returns not available")
+        if price_data.empty:
+            raise ValueError("Price data not loaded")
         
-        # Calculate rolling volatility (30-day window)
+        # Calculate returns if not already calculated
+        if 'Log_Return' not in price_data.columns:
+            # Create log returns
+            price_data['Log_Return'] = np.log(price_data['Price'] / price_data['Price'].shift(1))
+        
         returns = price_data['Log_Return'].dropna()
+        
+        # Calculate rolling volatility (30-day window) - FIXED VERSION
         rolling_volatility = returns.rolling(window=30).std().dropna()
         
-        # Prepare volatility data
+        # Prepare volatility data - align with original dates
         vol_data = []
-        for idx, vol in rolling_volatility.items():
-            if pd.notna(vol) and idx in price_data.index:
-                vol_data.append({
-                    "date": price_data.loc[idx, 'Date'].strftime('%Y-%m-%d'),
-                    "volatility": round(vol, 4),
-                    "price": round(price_data.loc[idx, 'Price'], 2) if 'Price' in price_data.columns else None
-                })
+        for i, (date_idx, vol) in enumerate(rolling_volatility.items()):
+            if pd.notna(vol):
+                # Get the corresponding date from price_data
+                # rolling_volatility index is offset by 30 due to window
+                if date_idx < len(price_data):
+                    date = price_data.loc[date_idx, 'Date']
+                    price = price_data.loc[date_idx, 'Price']
+                    
+                    vol_data.append({
+                        "date": date.strftime('%Y-%m-%d'),
+                        "volatility": round(vol, 4),
+                        "price": round(price, 2)
+                    })
         
         # Volatility statistics
         vol_stats = {
             "mean": round(returns.std(), 4),
-            "max": round(returns.std() * 3, 4),  # Approx max
-            "min": round(returns.std() * 0.5, 4),  # Approx min
-            "current": round(rolling_volatility.iloc[-1] if len(rolling_volatility) > 0 else returns.std(), 4)
+            "max": round(rolling_volatility.max(), 4) if len(rolling_volatility) > 0 else 0,
+            "min": round(rolling_volatility.min(), 4) if len(rolling_volatility) > 0 else 0,
+            "current": round(rolling_volatility.iloc[-1], 4) if len(rolling_volatility) > 0 else round(returns.std(), 4)
         }
         
         return jsonify({
@@ -288,9 +329,10 @@ def get_volatility():
         })
     
     except Exception as e:
+        print(f"❌ Error in /api/volatility: {str(e)}")
         return jsonify({
             "success": False,
-            "error": str(e)
+            "error": f"Volatility calculation failed: {str(e)}"
         }), 500
 
 @app.route('/api/event-impact/<event_id>', methods=['GET'])
@@ -354,14 +396,8 @@ def get_event_impact(event_id):
                 "after_event": round(price_after, 2),
                 "absolute_change": round(price_change, 2),
                 "percentage_change": round(price_change_pct, 2)
-            },
-            "price_data": window_data[['Date', 'Price']].to_dict('records')
+            }
         }
-        
-        # Format dates in price data
-        for item in impact_data['price_data']:
-            if 'Date' in item and pd.notna(item['Date']):
-                item['Date'] = item['Date'].strftime('%Y-%m-%d')
         
         return jsonify({
             "success": True,
@@ -369,6 +405,7 @@ def get_event_impact(event_id):
         })
     
     except Exception as e:
+        print(f"❌ Error in /api/event-impact/{event_id}: {str(e)}")
         return jsonify({
             "success": False,
             "error": str(e)
@@ -390,6 +427,9 @@ def get_price_predictions():
             }), 400
         
         # Calculate average daily return
+        if 'Log_Return' not in recent_data.columns:
+            recent_data['Log_Return'] = np.log(recent_data['Price'] / recent_data['Price'].shift(1))
+        
         recent_returns = recent_data['Log_Return'].dropna().mean()
         
         # Generate 7-day forecast
@@ -399,7 +439,7 @@ def get_price_predictions():
         predictions = []
         for i in range(1, 8):
             forecast_date = last_date + timedelta(days=i)
-            forecast_price = last_price * (1 + recent_returns) ** i
+            forecast_price = last_price * np.exp(recent_returns * i)  # Correct formula for log returns
             
             predictions.append({
                 "date": forecast_date.strftime('%Y-%m-%d'),
@@ -419,6 +459,7 @@ def get_price_predictions():
         })
     
     except Exception as e:
+        print(f"❌ Error in /api/price-predictions: {str(e)}")
         return jsonify({
             "success": False,
             "error": str(e)

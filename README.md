@@ -304,12 +304,19 @@ Model Specification:
 • Energy Companies: Price volatility analysis for supply chain planning
 • All stakeholders: Intuitive interface for exploring 35 years of oil market data
 
-### 🚀 READY FOR DEPLOYMENT
-• Backend: Flask API serving processed data from Tasks 1-2
-• Frontend: Production-ready React app with optimized performance
-• Documentation: Comprehensive README with setup instructions
-• Docker: Containerized setup for easy deployment
-
+## 📊 DASHBOARD FEATURES
+- Complete React dashboard with 4 tabs: Overview, Analytics, Predictions, Events
+- Interactive price chart with event markers and change point visualization
+- SettingsPanel with platform information and technical details
+- Event impact analysis with before/after price comparisons
+- Real-time API monitoring with console debugging
+- Responsive Material-UI design for all devices
+![alt text](image.png)
+![alt text](image-1.png)
+![alt text](image-2.png)
+![alt text](image-3.png)
+![alt text](image-4.png)
+![alt text](image-5.png)
 # 🚀 Quick Start
 1. Installation
 

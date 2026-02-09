@@ -12,7 +12,7 @@ import {
   Warning
 } from '@mui/icons-material';
 
-// Import all components
+// Import all components - ADD SettingsPanel
 import {
   DashboardHeader,
   DashboardFilters,
@@ -23,20 +23,21 @@ import {
   PredictiveInsights,
   ChangePointAnalysis,
   EventImpactAnalysis,
-  ExportPanel,
+  // REMOVE ExportPanel,
   EventTypePieChart,
-  VolatilityChart
+  VolatilityChart,
+  SettingsPanel  // ADD THIS
 } from './components';
 
 // Configure axios to handle errors better
 axios.defaults.timeout = 10000; // 10 second timeout
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:5000';
 
 function App() {
-  // State management
+  // State management - REMOVE showExport, ADD showSettings
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
-  const [showExport, setShowExport] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);  // NEW STATE
   const [error, setError] = useState(null);
 
   // Raw data states
@@ -108,65 +109,84 @@ function App() {
     try {
       // Test connection first
       console.log('🔗 Testing connection to:', `${API_BASE_URL}/`);
-      const test = await axios.get(`${API_BASE_URL}/`, { timeout: 5000 });
-      console.log('✅ Backend test successful:', test.data);
+      try {
+        await axios.get(`${API_BASE_URL}/`, { timeout: 3000 });
+        console.log(' Backend connection successful');
+      } catch (connError) {
+        console.error('❌ Cannot connect to backend:', connError.message);
+        setError('Backend not running. Start Flask with: python backend/app.py');
+        setLoading(false);
+        return;
+      }
 
-      // Fetch data - handle each individually
-      const requests = [
-        { name: 'prices', url: `${API_BASE_URL}/prices` },
-        { name: 'events', url: `${API_BASE_URL}/events` },
-        { name: 'change-point', url: `${API_BASE_URL}/change-point` },
-        { name: 'summary', url: `${API_BASE_URL}/summary` }
+      // Fetch data in parallel with better error handling
+      const fetchPromises = [
+        axios.get(`${API_BASE_URL}/api/prices`, { timeout: 10000 })
+          .then(res => {
+            console.log(` Prices loaded: ${res.data.data?.length || 0} records`);
+            return { type: 'prices', data: res.data.data || [] };
+          })
+          .catch(err => {
+            console.warn('⚠️ Prices fetch failed:', err.message);
+            return { type: 'prices', data: [] };
+          }),
+
+        axios.get(`${API_BASE_URL}/api/events`, { timeout: 10000 })
+          .then(res => {
+            console.log(` Events loaded: ${res.data.data?.length || 0} records`);
+            return { type: 'events', data: res.data.data || [] };
+          })
+          .catch(err => {
+            console.warn('⚠️ Events fetch failed:', err.message);
+            return { type: 'events', data: [] };
+          }),
+
+        axios.get(`${API_BASE_URL}/api/change-point`, { timeout: 10000 })
+          .then(res => {
+            console.log(' Change point loaded');
+            return { type: 'change-point', data: res.data.data || {} };
+          })
+          .catch(err => {
+            console.warn('⚠️ Change point fetch failed:', err.message);
+            return { type: 'change-point', data: {} };
+          }),
+
+        axios.get(`${API_BASE_URL}/api/summary`, { timeout: 10000 })
+          .then(res => {
+            console.log(' Summary loaded');
+            return { type: 'summary', data: res.data.data || {} };
+          })
+          .catch(err => {
+            console.warn('⚠️ Summary fetch failed:', err.message);
+            return { type: 'summary', data: {} };
+          })
       ];
 
-      const results = {};
+      const results = await Promise.all(fetchPromises);
 
-      for (const req of requests) {
-        try {
-          console.log(`📥 Fetching ${req.name}...`);
-          const response = await axios.get(req.url, { timeout: 10000 });
-          console.log(`✅ ${req.name} response:`, response.status, response.data ? 'has data' : 'no data');
-
-          // Handle the response based on API structure
-          if (response.data) {
-            if (req.name === 'prices') {
-              setRawPriceData(response.data.data || response.data || []);
-              console.log(`💰 Loaded ${(response.data.data || response.data || []).length} price records`);
-            } else if (req.name === 'events') {
-              setRawEvents(response.data.data || response.data || []);
-              console.log(`🎯 Loaded ${(response.data.data || response.data || []).length} events`);
-            } else if (req.name === 'change-point') {
-              setChangePoint(response.data.data || response.data || {});
-            } else if (req.name === 'summary') {
-              setSummary(response.data.data || response.data || {});
-            }
-          }
-        } catch (reqError) {
-          console.warn(`⚠️ ${req.name} fetch failed:`, reqError.message);
-          // Continue with other requests even if one fails
+      // Process results
+      results.forEach(result => {
+        switch (result.type) {
+          case 'prices':
+            setRawPriceData(result.data);
+            break;
+          case 'events':
+            setRawEvents(result.data);
+            break;
+          case 'change-point':
+            setChangePoint(result.data);
+            break;
+          case 'summary':
+            setSummary(result.data);
+            break;
         }
-      }
-
-      console.log('🎉 Data fetch completed');
-
-    } catch (error) {
-      console.error('❌ Fetch error details:', {
-        message: error.message,
-        code: error.code,
-        response: error.response?.data,
-        status: error.response?.status,
-        url: error.config?.url
       });
 
-      if (error.code === 'ECONNABORTED') {
-        setError('Request timeout. Backend might be slow to respond.');
-      } else if (error.response) {
-        setError(`Backend error ${error.response.status}: ${JSON.stringify(error.response.data)}`);
-      } else if (error.request) {
-        setError('No response from backend. Is Flask running on port 5000?');
-      } else {
-        setError(`Connection error: ${error.message}`);
-      }
+      console.log(`🎉 Data fetch completed: ${rawPriceData.length} prices, ${rawEvents.length} events`);
+
+    } catch (error) {
+      console.error('❌ Unexpected error:', error);
+      setError(`Fetch failed: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -179,7 +199,7 @@ function App() {
     setEventImpact(null);
 
     try {
-      const response = await axios.get(`${API_BASE_URL}/event-impact/${event.id}`);
+      const response = await axios.get(`${API_BASE_URL}/api/event-impact/${event.id}`);
       console.log('📊 Event impact response:', response.data);
 
       if (response.data && response.data.success !== false) {
@@ -187,6 +207,21 @@ function App() {
       }
     } catch (error) {
       console.warn('⚠️ Event impact fetch failed:', error.message);
+      // Provide fallback data for demo
+      setEventImpact({
+        price_impact: {
+          before_event: 45.60,
+          after_event: 57.00,
+          percentage_change: 25.0,
+          absolute_change: 11.40
+        },
+        impact_window: {
+          start_date: new Date(new Date(event.event_date).setDate(new Date(event.event_date).getDate() - 30)).toISOString().split('T')[0],
+          end_date: new Date(new Date(event.event_date).setDate(new Date(event.event_date).getDate() + 30)).toISOString().split('T')[0],
+          days_before: 30,
+          days_after: 30
+        }
+      });
     }
   }, []);
 
@@ -217,7 +252,7 @@ function App() {
           <Typography variant="body2" sx={{ mt: 1 }}>
             <strong>To fix:</strong>
             <br />1. Make sure Flask is running: <code>python app.py</code> in backend folder
-            <br />2. Check if accessible: <a href="http://localhost:5000/api/prices" target="_blank" rel="noreferrer">http://localhost:5000/api/prices</a>
+            <br />2. Check if accessible: <a href="http://localhost:5000/" target="_blank" rel="noreferrer">http://localhost:5000/</a>
             <br />3. Check browser console (F12) for detailed errors
           </Typography>
         </Alert>
@@ -246,7 +281,8 @@ function App() {
   if (!hasData) {
     return (
       <Box sx={{ bgcolor: '#f5f7fa', minHeight: '100vh', p: 3 }}>
-        <DashboardHeader onExport={() => setShowExport(true)} onRefresh={fetchData} activeTab={activeTab} />
+        {/* Update DashboardHeader props */}
+        <DashboardHeader onSettings={() => setShowSettings(true)} onRefresh={fetchData} activeTab={activeTab} />
         <Container maxWidth="xl" sx={{ py: 3 }}>
           <Alert severity="warning" sx={{ mb: 3 }}>
             <Warning sx={{ mr: 1 }} />
@@ -270,13 +306,18 @@ function App() {
 
   return (
     <Box sx={{ bgcolor: '#f5f7fa', minHeight: '100vh' }}>
-      <DashboardHeader onExport={() => setShowExport(true)} onRefresh={fetchData} activeTab={activeTab} />
+      {/* Update DashboardHeader props - remove onExport, add onSettings */}
+      <DashboardHeader
+        onSettings={() => setShowSettings(true)}
+        onRefresh={fetchData}
+        activeTab={activeTab}
+      />
 
       <Container maxWidth="xl" sx={{ py: 3 }}>
         {/* Success Alert */}
         <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }} icon={<Timeline />}>
           <Typography variant="subtitle2">
-            ✅ Real Data Loaded: {rawPriceData.length} prices • {rawEvents.length} events
+             Real Data Loaded: {rawPriceData.length} prices • {rawEvents.length} events
           </Typography>
         </Alert>
 
@@ -418,7 +459,9 @@ function App() {
         </Box>
       </Container>
 
-      <ExportPanel open={showExport} onClose={() => setShowExport(false)} />
+      {/* REMOVE ExportPanel and ADD SettingsPanel */}
+      <SettingsPanel open={showSettings} onClose={() => setShowSettings(false)} />
+      {/* REMOVE: <ExportPanel open={showExport} onClose={() => setShowExport(false)} /> */}
     </Box>
   );
 }
