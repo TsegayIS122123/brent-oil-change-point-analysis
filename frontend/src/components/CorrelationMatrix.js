@@ -11,8 +11,7 @@ import {
     TableCell,
     TableContainer,
     TableHead,
-    TableRow,
-    Tooltip
+    TableRow
 } from '@mui/material';
 import {
     TrendingUp,
