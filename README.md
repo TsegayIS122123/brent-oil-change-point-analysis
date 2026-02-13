@@ -8,11 +8,6 @@ Bayesian change-point analysis of Brent crude oil prices to detect regime shifts
 - **Policymakers**: Economic stability and energy security
 - **Energy Companies**: Operational planning and supply chain management
 
-## 🌐 Live Demo
-- **Dashboard**: [https://brent-oil-change-point-analysis-3qmaov6iq.vercel.app](https://brent-oil-change-point-analysis-3qmaov6iq.vercel.app)
-- **Backend API**: [https://brent-oil-api.onrender.com](https://brent-oil-api.onrender.com)
-- **GitHub**: [https://github.com/TsegayIS122123/brent-oil-change-point-analysis](https://github.com/TsegayIS122123/brent-oil-change-point-analysis)
-
 ## 📈 Objective
 1. **Identify** key events impacting oil prices (past decade)
 2. **Quantify** event impacts using Bayesian change point analysis
@@ -36,6 +31,10 @@ Bayesian change-point analysis of Brent crude oil prices to detect regime shifts
 [![Deployed on Render](https://img.shields.io/badge/Deployed-Render-blue)](https://brent-oil-api.onrender.com)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
 [![React](https://img.shields.io/badge/React-18-blue)](https://reactjs.org/)
+
+## 🌐 Live Demo
+- **Dashboard**: [https://brent-oil-change-point-analysis-3qmaov6iq.vercel.app](https://brent-oil-change-point-analysis-3qmaov6iq.vercel.app)
+- **Backend API**: [https://brent-oil-api.onrender.com](https://brent-oil-api.onrender.com)
 
 # 📊 Data Sources
 - Brent Oil Prices: Daily prices from May 20, 1987 to September 30, 2022
