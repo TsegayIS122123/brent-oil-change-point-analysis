@@ -2,6 +2,14 @@
 ## 📊 Project Overview
 Bayesian change-point analysis of Brent crude oil prices to detect regime shifts, volatility changes, and event-driven market impacts using PyMC, time series modeling, and interactive dashboards.
 
+[![CI/CD Pipeline](https://github.com/TsegayIS122123/brent-oil-change-point-analysis/actions/workflows/ci.yml/badge.svg)](https://github.com/TsegayIS122123/brent-oil-change-point-analysis/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/TsegayIS122123/brent-oil-change-point-analysis/branch/main/graph/badge.svg)](https://codecov.io/gh/TsegayIS122123/brent-oil-change-point-analysis)
+[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-3.0-green.svg)](https://flask.palletsprojects.com/)
+[![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org/)
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed-Vercel-black)](https://brent-oil-change-point-analysis-3qmaov6iq.vercel.app)
+[![Deployed on Render](https://img.shields.io/badge/Deployed-Render-blue)](https://brent-oil-api.onrender.com)
+
 ## 🎯 Business Context
 **Birhan Energies** (fictional consultancy) analyzes how major events affect Brent oil prices for stakeholders:
 - **Investors**: Risk management and profit maximization
@@ -14,11 +22,6 @@ Bayesian change-point analysis of Brent crude oil prices to detect regime shifts
 3. **Provide** data-driven insights for strategic decision-making
 
 **Bayesian Analysis of Geopolitical Events on Oil Markets**  
-[![Python 3.13](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/)
-[![PyMC](https://img.shields.io/badge/PyMC-5.10-red.svg)](https://www.pymc.io/)
-[![Flask](https://img.shields.io/badge/Flask-3.0-green.svg)](https://flask.palletsprojects.com/)
-[![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org/)
-[![CI/CD](https://github.com/TsegayIS122123/brent-oil-change-point-analysis/actions/workflows/ci.yml/badge.svg)](https://github.com/TsegayIS122123/brent-oil-change-point-analysis/actions)
 
 # 📋 Key Features
 - Bayesian change point detection using PyMC
@@ -26,11 +29,6 @@ Bayesian change-point analysis of Brent crude oil prices to detect regime shifts
 - Interactive dashboard with Flask + React
 - MCMC diagnostics and model comparison
 - Comprehensive reporting
-
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed-Vercel-black)](https://brent-oil-change-point-analysis-3qmaov6iq.vercel.app)
-[![Deployed on Render](https://img.shields.io/badge/Deployed-Render-blue)](https://brent-oil-api.onrender.com)
-[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
-[![React](https://img.shields.io/badge/React-18-blue)](https://reactjs.org/)
 
 ## 🌐 Live Demo
 - **Dashboard**: [https://brent-oil-change-point-analysis-3qmaov6iq.vercel.app](https://brent-oil-change-point-analysis-3qmaov6iq.vercel.app)
@@ -326,6 +324,30 @@ Model Specification:
 ![alt text](image-3.png)
 ![alt text](image-4.png)
 ![alt text](image-5.png)
+# 📁 Project Structure
+brent-oil-change-point-analysis/
+├── backend/
+│   ├── app.py                 # Flask API
+│   └── requirements.txt       # Backend dependencies
+├── frontend/
+│   ├── src/
+│   │   ├── components/        #  React components
+│   │   └── App.js             # Main React app
+│   └── package.json           # Frontend dependencies
+├── data/
+│   ├── raw/                   # Raw BrentOilPrices.csv
+│   ├── processed/              # Processed data
+│   └── external/               # key_events.csv
+├── src/
+│   ├── data_processor.py      # Data loading & preprocessing
+│   └── change_point_model.py   # Bayesian model
+├── tests/
+│   ├── test_data_processor.py  # Unit tests
+│   └── test_change_point.py    # Unit tests
+├── .github/workflows/
+│   └── ci.yml                  # CI/CD pipeline
+├── requirements.txt            # Python dependencies
+└── README.md                    # This file
 # 🚀 Quick Start
 1. Installation
 
