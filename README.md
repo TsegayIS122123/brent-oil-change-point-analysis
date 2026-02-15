@@ -324,30 +324,32 @@ Model Specification:
 ![alt text](image-3.png)
 ![alt text](image-4.png)
 ![alt text](image-5.png)
-# 📁 Project Structure
+## 📁 Project Structure
+```
 brent-oil-change-point-analysis/
 ├── backend/
 │   ├── app.py                 # Flask API
 │   └── requirements.txt       # Backend dependencies
 ├── frontend/
 │   ├── src/
-│   │   ├── components/        #  React components
+│   │   ├── components/        # React components
 │   │   └── App.js             # Main React app
 │   └── package.json           # Frontend dependencies
 ├── data/
 │   ├── raw/                   # Raw BrentOilPrices.csv
-│   ├── processed/              # Processed data
-│   └── external/               # key_events.csv
+│   ├── processed/             # Processed data
+│   └── external/              # key_events.csv
 ├── src/
 │   ├── data_processor.py      # Data loading & preprocessing
-│   └── change_point_model.py   # Bayesian model
+│   └── change_point_model.py  # Bayesian model
 ├── tests/
-│   ├── test_data_processor.py  # Unit tests
-│   └── test_change_point.py    # Unit tests
+│   ├── test_data_processor.py # Unit tests
+│   └── test_change_point.py   # Unit tests
 ├── .github/workflows/
-│   └── ci.yml                  # CI/CD pipeline
+│   └── ci.yml                 # CI/CD pipeline
 ├── requirements.txt            # Python dependencies
-└── README.md                    # This file
+└── README.md                   # This file
+```
 # 🚀 Quick Start
 1. Installation
 
