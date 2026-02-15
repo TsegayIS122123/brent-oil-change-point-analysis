@@ -10,54 +10,59 @@ from datetime import datetime, timedelta
 
 def generate_mock_price_data(n_days=1000):
     """
-    Generate realistic mock oil price data based on historical patterns.
-    
-    Args:
-        n_days: Number of days to generate (default: 1000)
-    
-    Returns:
-        DataFrame with Date, Price, and Log_Return columns
+    Generate realistic mock oil price data.
+    FIXED: Uses historical dates (2015-2022) to match frontend expectations.
     """
     print(f"📊 Generating {n_days} days of mock price data...")
-    
-    end_date = datetime.now()
-    start_date = end_date - timedelta(days=n_days)
-    
+
+    # USE HISTORICAL DATES THAT MATCH FRONTEND DEFAULTS
+    start_date = pd.Timestamp('2015-01-01')
+    end_date = pd.Timestamp('2022-12-31')
+
     dates = pd.date_range(start_date, end_date, periods=n_days)
-    
+
     # Set seed for reproducibility
     np.random.seed(42)
-    
-    # Start at realistic price
-    prices = [68.96]  # Starting at detected change point price
-    
-    # Generate realistic returns with volatility clustering
+
+    # Start at realistic price (based on actual 2015 prices)
+    prices = [52.31]  # Using your detected change point price
+
+    # Generate realistic returns based on actual oil market patterns
     for i in range(1, n_days):
-        # Random return with slight positive drift
-        daily_return = np.random.normal(0.0002, 0.025)
-        
-        # Add some autocorrelation (volatility clustering)
-        if i > 30 and np.std(prices[-30:]) > 2.0:
-            daily_return = np.random.normal(0.0001, 0.035)  # Higher volatility
-        
+        # Random return with realistic volatility
+        daily_return = np.random.normal(0.0001, 0.025)
+
+        # Add known event impacts
+        current_date = dates[i]
+
+        # COVID-19 crash (March 2020)
+        if current_date >= pd.Timestamp('2020-03-01') and current_date <= pd.Timestamp('2020-04-30'):
+            daily_return = np.random.normal(-0.005, 0.04)  # Negative returns, high volatility
+
+        # Post-COVID recovery (2021)
+        elif current_date >= pd.Timestamp('2021-01-01') and current_date <= pd.Timestamp('2021-12-31'):
+            daily_return = np.random.normal(0.0005, 0.02)  # Positive drift, lower volatility
+
+        # Russia-Ukraine impact (2022)
+        elif current_date >= pd.Timestamp('2022-02-01'):
+            daily_return = np.random.normal(0.0003, 0.03)  # Higher volatility
+
         new_price = prices[-1] * (1 + daily_return)
-        
-        # Keep prices within realistic range ($20 - $150)
-        new_price = max(min(new_price, 150.0), 20.0)
+        new_price = max(min(new_price, 120.0), 20.0)  # Realistic range
         prices.append(new_price)
-    
+
     df = pd.DataFrame({
         'Date': dates,
         'Price': [round(p, 2) for p in prices]
     })
-    
+
     # Add log returns
-    df['Log_Return'] = np.log(df['Price'] / df['Price'].shift(1))
-    
+    df['Log_Return'] = np.log(df['Price'] / df['Price'].shift(1)).fillna(0)
+
     print(f"✅ Generated {len(df)} mock price records")
     print(f"   Date range: {df['Date'].min().strftime('%Y-%m-%d')} to {df['Date'].max().strftime('%Y-%m-%d')}")
     print(f"   Price range: ${df['Price'].min():.2f} to ${df['Price'].max():.2f}")
-    
+
     return df
 
 def generate_mock_events():
