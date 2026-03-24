@@ -318,12 +318,12 @@ Model Specification:
 - Event impact analysis with before/after price comparisons
 - Real-time API monitoring with console debugging
 - Responsive Material-UI design for all devices
-![alt text](image.png)
-![alt text](image-1.png)
-![alt text](image-2.png)
-![alt text](image-3.png)
-![alt text](image-4.png)
-![alt text](image-5.png)
+![alt text](docs/image.png)
+![alt text](docs/image-1.png)
+![alt text](docs/image-2.png)
+![alt text](docs/image-3.png)
+![alt text](docs/image-4.png)
+![alt text](docs/image-5.png)
 ## 📁 Project Structure
 ```
 brent-oil-change-point-analysis/
