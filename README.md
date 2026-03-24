@@ -322,12 +322,12 @@ Model Specification:
 
 | Dashboard View | Description |
 |----------------|-------------|
-| ![Main Dashboard](docs/images/image.png) | Main dashboard with price chart and event markers |
-| ![Analytics View](docs/images/image-1.png) | Analytics tab with statistical metrics |
-| ![Predictions](docs/images/image-2.png) | Change point predictions and confidence intervals |
-| ![Events](docs/images/image-3.png) | Event correlation analysis |
-| ![Settings](docs/images/image-4.png) | Settings panel |
-| ![Mobile View](docs/images/image-5.png) | Responsive mobile design |
+| ![Main Dashboard](docs/images/image.png) | Main dashboard with key indicaters |
+| ![Analytics View](docs/images/image-1.png) | Analytics price chart with statistical metrics |
+| ![Predictions](docs/images/image-2.png) |Event-price and type correlation analysis Change point predictions |
+| ![Events](docs/images/image-3.png) | Event correlation and volatility analysis |
+| ![AI-Power](docs/images/image-4.png) |AI-Power predicative insights|
+| ![Settings View](docs/images/image-5.png) | Settings panel  |
 ## 📁 Project Structure
 ```
 brent-oil-change-point-analysis/
