@@ -318,12 +318,16 @@ Model Specification:
 - Event impact analysis with before/after price comparisons
 - Real-time API monitoring with console debugging
 - Responsive Material-UI design for all devices
-![alt text](docs/image.png)
-![alt text](docs/image-1.png)
-![alt text](docs/image-2.png)
-![alt text](docs/image-3.png)
-![alt text](docs/image-4.png)
-![alt text](docs/image-5.png)
+## 📊 Dashboard Screenshots
+
+| Dashboard View | Description |
+|----------------|-------------|
+| ![Main Dashboard](docs/images/image.png) | Main dashboard with price chart and event markers |
+| ![Analytics View](docs/images/image-1.png) | Analytics tab with statistical metrics |
+| ![Predictions](docs/images/image-2.png) | Change point predictions and confidence intervals |
+| ![Events](docs/images/image-3.png) | Event correlation analysis |
+| ![Settings](docs/images/image-4.png) | Settings panel |
+| ![Mobile View](docs/images/image-5.png) | Responsive mobile design |
 ## 📁 Project Structure
 ```
 brent-oil-change-point-analysis/
